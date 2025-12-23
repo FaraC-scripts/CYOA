@@ -1,3 +1,4 @@
+
 const modifier = (text) => {
   const regex = /\n? ?(?:> You |> You say "|)\/(\w+?)( [\w ]+)?[".]?\n?$/i
   const commandMatcher = text.match(regex)
@@ -8,6 +9,7 @@ const modifier = (text) => {
   let stop = false;
   const modeMax = 2
 
+  if(!state.cyoaMode){state.cyoaMode = 1}
   if (commandMatcher) {
     command = commandMatcher[1].toLowerCase()
     args = commandMatcher[2] ? commandMatcher[2].toLowerCase().trim().split(' ') : []
@@ -15,6 +17,10 @@ const modifier = (text) => {
   if(command === "cyoa"){
     state.cyoa = true;
     newText = state.cyoaLine
+    if(args[0]==="mode"){
+      state.cyoaMode += 1
+      if(state.cyoaMode > modeMax) {state.cyoaMode = 1}
+    }
   }
   if(command === "a" && state.latestCyoa){
     newText = "\n\n["+findLastLineStartingWith(state.latestCyoa, "A.").substring(3)+"]\n"
@@ -34,3 +40,6 @@ const modifier = (text) => {
   }
   return { text: newText, stop }
 }
+
+// Don't modify this part
+modifier(text)
