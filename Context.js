@@ -1,6 +1,5 @@
 
 const modifier = (text) => {
-  let newText = text.replace("\nRecent Story:", "")
   if(state.cyoaLine){
     newText = newText.replaceAll(state.cyoaLine, "\n")
   }
