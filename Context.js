@@ -1,5 +1,5 @@
 const modifier = (text) => {
-  text = handleCyoaInput(text)
+  text = handleCyoaContext(text)
   return { text }
 }
 
