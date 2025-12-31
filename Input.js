@@ -14,7 +14,7 @@ const modifier = (text) => {
     command = commandMatcher[1].toLowerCase()
     args = commandMatcher[2] ? commandMatcher[2].toLowerCase().trim().split(' ') : []
   }
-  if(command === "cyoa"){
+  if(command === "cyoa" || command === "y"){
     state.cyoa = true;
     newText = state.cyoaLine
     if(args[0]==="mode"){
