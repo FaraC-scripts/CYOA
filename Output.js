@@ -1,4 +1,5 @@
 const modifier = (text) => {
+    let newText = text
     if(state.cyoa){
         if (newText.startsWith('\n')){
             newText = newText.substring(1)
