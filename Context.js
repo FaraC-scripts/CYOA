@@ -1,5 +1,6 @@
 
 const modifier = (text) => {
+  let newText = text
   if(state.cyoaLine){
     newText = newText.replaceAll(state.cyoaLine, "\n")
   }
