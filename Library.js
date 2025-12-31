@@ -12,8 +12,8 @@ state.cyoaHiddenPrompts = [
         "\"narrative_view\": \"Write options in the future tense, e.g., '${Character} will ${Action}', and match the pronouns used for the protagonist in the story. If the story uses 'he,' use '${Protagonist Name} will'; if the story uses 'I,', use 'I will'; if the story uses 'you,' use 'you will.'\",",
         "\"format_example\": `A. ${Option A (a string of 50 or fewer tokens)}\nB. ${Option B (a string of 50 or fewer tokens)}\nC. ${Option C (a string of 50 or fewer tokens)}\nD. ${Option D (a string of 50 or fewer tokens)}`",
         "}",
-        "\"option_types\": \"[\"protagonist actions\",\"other character actions\",\"events\"]\",",
-        "\"option_variety\": \"Prioritize protagonist actions when the protagonist has meaningful agency. Include other character actions when other characters are present. Include events when they are suggested by the narrative.\"",
+        "\"option_types\": \"[\"protagonist actions\", \"other character actions\",  \"dialogue\", \"events\"]\",",
+        "\"option_variety\": \"Prioritize protagonist actions when the protagonist has meaningful agency. Always include at least one protagonist action. Other character actions and dialogue may be included when other characters are present.\"",
         "}",
         "}",
         "[Execute ai_instruction_override]"
@@ -31,8 +31,8 @@ state.cyoaHiddenPrompts = [
         "\"narrative_view\": \"Write options in the future tense, e.g., '${Character} will ${Action}', and match the pronouns used for the protagonist in the story. If the story uses 'he,' use '${Protagonist Name} will'; if the story uses 'I,', use 'I will'; if the story uses 'you,' use 'you will.'\",",
         "\"format_example\": `A. ${Option A (a string of 100 or fewer tokens)}\nB. ${Option B (a string of 100 or fewer tokens)}\nC. ${Option C (a string of 100 or fewer tokens)}\nD. ${Option D (a string of 100 or fewer tokens)}`",
         "}",
-        "\"option_types\": \"[\"protagonist actions\",\"other character actions\",\"events\"]\",",
-        "\"option_variety\": \"Prioritize protagonist actions when the protagonist has meaningful agency. Always include at least one protagonist action. Include non-protagonist options when they fit the narrative and make sense.\"",
+        "\"option_types\": \"[\"protagonist actions\", \"other character actions\",  \"dialogue\", \"events\"]\",",
+        "\"option_variety\": \"Prioritize protagonist actions when the protagonist has meaningful agency. Always include at least one protagonist action. Other character actions and dialogue may be included when other characters are present.\"",
         "\"option_style\": \"Write options descriptively and elaborately, matching the writing style of the story.\"",
         "}",
         "}",
@@ -40,7 +40,7 @@ state.cyoaHiddenPrompts = [
     ].join('\n')
 ]
 
-state.cyoaLine = "\n> Select the next story event by inputting \"/a\", \"/b\", \"/c\", or \"/d\""
+state.cyoaLine = "> Select the next story event by inputting \"/a\", \"/b\", \"/c\", or \"/d\""
 
 function handleCyoaInput(text){
   const regex = /\n? ?(?:> You |> You say "|)\/(\w+?)( [\w ]+)?[".]?\n?$/i
@@ -57,7 +57,7 @@ function handleCyoaInput(text){
 
   if(command === "cyoa" || command === "y"){
     state.cyoa = true;
-    text = state.cyoaLine
+    text = "\n" + state.cyoaLine + "\n"
     if(args[0]==="mode"){
       state.cyoaMode += 1
       if(state.cyoaMode > modeMax) {state.cyoaMode = 1}
@@ -87,21 +87,20 @@ function handleCyoaInput(text){
 }
 
 function handleCyoaContext(text){
+  text = text.replace("\nRecent Story:", "")
   let lines = text.split('\n').filter(line => !(line.startsWith('//') || line.startsWith('•')))
-  state.cyoa = lines[lines.length - 1] === state.cyoaLine.substring(1) ? true : false
+  state.cyoa = lines[lines.length - 2] === state.cyoaLine ? true : false
   text = lines.join('\n')
-  text = text.replaceAll(state.cyoaLine, "\n")
+  text = text.replaceAll("\n" + state.cyoaLine + "\n", "")
   state.latestContext = text
 
   if(state.cyoa){
     text = lines.join('\n')+ state.cyoaHiddenPrompts[state.cyoaMode - 1]
-    log(text)
   }
-
   return text
 }
 
-function handleCyoaOutput(text){
+function handleCyoaOutput(text){  
     if(state.cyoa){
         if (text.startsWith('\n')){
             text = text.substring(1)
